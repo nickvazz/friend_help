@@ -6,3 +6,5 @@ Courtney/ARM_E13_surface_met_new.nc
 Rob/MacheneLearningOutputs/
 MachineLearningOutputs/
 Jenny/login.py
+login.pyc
+__pycache__/
