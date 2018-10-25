@@ -55,12 +55,12 @@ class FacebookBot:
             self.driver.get(group[1])
             time.sleep(3)
             try:
-
                 post_pg_element = self.driver.find_element(By.CSS_SELECTOR, '#u_0_0')
                 submit_pg_element = self.driver.find_element(By.NAME, 'view_post')
 
                 post_pg_element.send_keys(post)
                 submit_pg_element.click()
+
             except NoSuchElementException:
                 print (group, 'failed')
                 continue
