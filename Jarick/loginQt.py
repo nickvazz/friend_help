@@ -1,7 +1,7 @@
 import sys
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QLabel, QLineEdit, QDialogButtonBox, QDialog
-from PyQt5.QtWidgets import QPushButton, QWidget, QVBoxLayout, QFormLayout, QGroupBox
+from PyQt5.QtWidgets import QPushButton, QWidget, QVBoxLayout, QFormLayout, QGroupBox, QCheckBox
 from PyQt5.QtCore import QSize
 
 class loginCredentials(QDialog):
@@ -15,6 +15,9 @@ class loginCredentials(QDialog):
         pw = QLineEdit()
         pw.setEchoMode(QLineEdit.Password)
         layout.addRow("Password", pw)
+
+        self.load_data = QCheckBox()
+        layout.addRow("Load Data?", self.load_data)
 
         self.login_creds = [login, pw]
         self.formGroupBox.setLayout(layout)

@@ -7,11 +7,16 @@ from PyQt5.QtWidgets import (QApplication, QComboBox, QDialog,
 
 from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtCore import QUrl
+import numpy as np
 
 class pickGroupsToPost(QDialog):
-    def __init__(self, groups):
+    def __init__(self, groups, urls, load_data=False, posts=[]):
         super(pickGroupsToPost, self).__init__()
-        self.createFormGroupBox(groups)
+        self.groups = groups
+        self.urls = urls
+        self.posts = posts
+        self.load_data = load_data
+        self.createFormGroupBox(self.groups, self.urls, self.load_data, self.posts)
 
         buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         buttonBox.accepted.connect(self.accept)
@@ -28,27 +33,40 @@ class pickGroupsToPost(QDialog):
         self.setLayout(mainLayout)
         self.setWindowTitle("Facebook Box Group Posting")
 
-    def createFormGroupBox(self, groups):
+    def createFormGroupBox(self, groups, urls, load_data=False, posts=[]):
+
         self.formGroupBox = QGroupBox("Click groups to post to.")
         layout = QFormLayout()
 
         self.checkboxes = []
-        self.posts = []
-        for idx, (group, url) in enumerate(groups):
+        new_posts = []
+        if not load_data:
+            groups = [item for sublist in groups for item in sublist]
+        print (groups)
+        print (urls)
+
+        for idx, (group, url) in enumerate(zip(groups, urls)):
             cbox = QCheckBox()
             label = QLabel()
-            post = QTextEdit('Enter Post Here')
 
-            label.setText(f' <a href=\"{url}\">{group[0]} </a>')
+
+            if load_data:
+                post = QTextEdit(self.posts[idx])
+            else:
+                post = QTextEdit('Enter Post Here')
+
+
+            label.setText(f' <a href=\"{url}\">{group} </a>')
             label.linkActivated.connect(self.link)
             label.setOpenExternalLinks(True)
             layout.addRow(label)
             layout.addRow(post, cbox)
 
             self.checkboxes.append(cbox)
-            self.posts.append(post)
+            new_posts.append(post)
 
         self.formGroupBox.setLayout(layout)
+        self.posts = new_posts
 
     def link(self, linkStr):
         QDesktopServices.openURL(QUrl(linkStr))

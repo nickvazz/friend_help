@@ -9,6 +9,7 @@ import time, re, sys
 from PyQt5.QtWidgets import QApplication
 from pickGroupsQt import pickGroupsToPost
 from loginQt import loginCredentials
+from LoadData import getPostsFromExcel
 
 class FacebookBot:
     URL = 'https://mbasic.facebook.com'
@@ -37,22 +38,25 @@ class FacebookBot:
         self.driver.get(self.URL + '/groups/?seemore&refid=27')
 
         groups = []
+        urls = []
         source = self.driver.page_source
         soup = BeautifulSoup(source, "html.parser")
 
         # find all group's url link
         for group in soup.find_all("a", href=re.compile(r"groups/\d")):
-            groups.append([group.contents, self.URL + group['href']])
+            groups.append(group.contents)
+            urls.append(self.URL + group['href'])
+        print (urls)
+        return groups, urls
 
-        return groups
-
-    def postToGroup(self, posts, groups, checkedGroups):
-        for idx, (post, group) in enumerate(zip(posts, groups)):
+    def postToGroup(self, posts, groups, urls, checkedGroups):
+        print (urls)
+        for idx, (post, group, url) in enumerate(zip(posts, groups, urls)):
 
             if not checkedGroups[idx]:
                 continue
 
-            self.driver.get(group[1])
+            self.driver.get(url)
             time.sleep(3)
             try:
                 post_pg_element = self.driver.find_element(By.CSS_SELECTOR, '#u_0_0')
@@ -81,22 +85,34 @@ def main():
         sys.exit(0)
 
     credentials = [x.text() for x in login.login_creds]
+    load_data = login.load_data
 
     driver = webdriver.Chrome()
     fbBot = FacebookBot(driver)
     # fbBot.login(*credentials)
     fbBot.login(usr, pwd)
 
-    groups = fbBot.getGroups()
+
+    load_data = login.load_data.isChecked()
+    if load_data:
+        data = getPostsFromExcel('test.xlsx')
+        posts, groups, urls = data.fixPostsInDataFrame()
+
+    else:
+        posts = []
+        urls = []
+        groups, urls = fbBot.getGroups()
 
     app2 = QApplication(sys.argv)
-    pickGroups = pickGroupsToPost(groups)
+    pickGroups = pickGroupsToPost(groups, urls, load_data=load_data, posts=posts)
+
+
     result = pickGroups.exec_()
     checkedGroups = [cbox.isChecked() for cbox in pickGroups.checkboxes]
+    # if not load_data:
     posts = [post.toPlainText() for post in pickGroups.posts]
-
     if result == pickGroups.Accepted:
-        fbBot.postToGroup(posts, groups, checkedGroups)
+        fbBot.postToGroup(posts, groups, urls, checkedGroups)
 
     sys.exit(login)
     sys.exit(pickGroups)
