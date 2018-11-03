@@ -89,8 +89,8 @@ def main():
 
     driver = webdriver.Chrome()
     fbBot = FacebookBot(driver)
-    # fbBot.login(*credentials)
-    fbBot.login(usr, pwd)
+    fbBot.login(*credentials)
+    # fbBot.login(usr, pwd)
 
 
     load_data = login.load_data.isChecked()
