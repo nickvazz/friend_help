@@ -8,3 +8,5 @@ MachineLearningOutputs/
 Jenny/login.py
 login.pyc
 __pycache__/
+*.un~
+*.py~
